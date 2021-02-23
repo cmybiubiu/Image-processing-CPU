@@ -366,7 +366,7 @@ def graph4(mode, filter = "3x3"):
     x_axis = [1, 10, 100, 1000, 10000, 100000]
 
     plotter.graph(
-        width_sizes, # x axis
+        width_powers, # x axis
         [local_results[method] for method in methods_as_list], # y vals
         methods_as_list,  # names for each line
         [colours[method] for method in methods_as_list],
