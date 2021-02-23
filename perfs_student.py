@@ -340,8 +340,8 @@ def graph3(mode):
     ylabel
   )
   
-#graph3('time')
-#graph3('l1d_loadmisses')
+graph3('time')
+# graph3('l1d_loadmisses')
 
 
 def graph4(mode, filter = "3x3"):
@@ -375,5 +375,5 @@ def graph4(mode, filter = "3x3"):
     )
 
 graph4('time')
-graph2('l1d_loadmisses')
+# graph4('l1d_loadmisses')
 

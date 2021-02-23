@@ -4,6 +4,8 @@ PGM_NAME = pgmWidthSize
 PGM_TYPE = .txt
 WIDTHS = 1 8 16 64 512 1024 4096 32768
 
+all: pgm_creator my_pgm main
+
 %.o: %.c
 	$(CC) -c -o $@ $< $(GCC_OPT)
 
@@ -19,3 +21,6 @@ my_pgm:
 
 clean:
 	rm *.o *.out
+
+run: all
+	python3 perfs_student.py
