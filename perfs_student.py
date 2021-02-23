@@ -221,6 +221,7 @@ def run_perf_exp4(filter, method, numthreads = 1, chunk_size = 1, width = 1, rep
     for i in range(repeat):
         ret = execute_command(main_args)
         time += float(ret[5:])
+        print (ret)
     time = time / repeat
     partial_results['time'] = time
     print ("method: {}, time: {}".format(method, time))
@@ -368,7 +369,7 @@ def graph4(mode, filter = "3x3"):
     xvals = [1,8,16,64,512,1024,4096,32768]
     list_of_colors = [colours[method] for method in methods_as_list]
     list_of_yvals = [local_results[method] for method in methods_as_list]
-    filename = 'graph_{}.png'.format(mode+" 4")
+    filename = 'graph_{}.png'.format(mode+"4")
     xlabel = "Width Sizes"
 
     legends = []
