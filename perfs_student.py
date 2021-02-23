@@ -350,7 +350,7 @@ def graph4(mode, filter = "3x3"):
 
     for method in methods:
         for power in width_powers:
-            width = 1 << power
+            width = pow(2, power)
             nthread = 8
             chunk_size = nthread
             key = (filter, method, nthread, chunk_size, width)
