@@ -3,6 +3,7 @@ GCC_OPT = -O2 -Wall -Werror
 PGM_NAME = pgmWidthSize
 PGM_TYPE = .txt
 WIDTHS = 1 2 4 8 16 32 64 128 256 512 1024 2048 4096 8192 16384 32768
+TOTAL_SIZE = 1048576
 
 all: pgm_creator my_pgm main
 
@@ -18,6 +19,35 @@ pgm_creator:
 
 my_pgm:
 	$(foreach var,$(WIDTHS),./pgm_creator.out $(var) $(var) $(PGM_NAME)$(var)$(PGM_TYPE);)
+
+create_pgm: my_pgm1 my_pgm2 my_pgm3 my_pgm4 my_pgm5 my_pgm6 my_pgm7 my_pgm8
+
+my_pgm1:
+	./pgm_creator.out 1 $(TOTAL_SIZE) pgmWidthSize1.txt
+
+my_pgm2:
+	./pgm_creator.out 8 131072 pgmWidthSize8.txt
+
+my_pgm3:
+	./pgm_creator.out 16 65536 pgmWidthSize16.txt
+
+my_pgm4:
+	./pgm_creator.out 64 16384 pgmWidthSize64.txt
+
+my_pgm5:
+	./pgm_creator.out 512 2048 pgmWidthSize512.txt
+
+my_pgm6:
+	./pgm_creator.out 1024 1024 pgmWidthSize1024.txt
+
+my_pgm7:
+	./pgm_creator.out 4096 256 pgmWidthSize4096.txt
+
+my_pgm8:
+	./pgm_creator.out 32768 32 pgmWidthSize32768.txt
+
+
+
 
 clean:
 	rm *.o *.out
