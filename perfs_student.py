@@ -362,7 +362,7 @@ def graph4(mode, filter = "3x3"):
 
     #sets are unordered by default, so impose an order with this list.
     methods_as_list = list(methods.keys())
-    x_axis = [1, 10, 100, 1000, 10000]
+    x_axis = [1, 10, 100, 1000, 10000, 100000]
 
     plotter.graph(
         x_axis, # x axis
