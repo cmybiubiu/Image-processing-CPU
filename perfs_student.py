@@ -162,6 +162,74 @@ def run_perf(filter, method, numthreads = 1, chunk_size = 1, input_file=default_
   with open('data.pickle', 'wb') as f:
     pickle.dump(results, f, pickle.HIGHEST_PROTOCOL)
 
+
+# helper for experiment 4
+def run_perf_exp4(filter, method, numthreads = 1, chunk_size = 1, width = 1, repeat =
+10):
+    key = (filter, method, numthreads, chunk_size, width)
+    if results.get(key) != None:
+        return
+
+    pgm_name = 'widthSize' + width + '.txt'
+    pgm_creator_args = './pgm_creator.out {} {} {}'.format(width, width, pgm_name)
+
+    main_args = './main.out -t {} -i {} -f {} -m {} -n {} -c {}'.format(
+        0, #don't print time
+        pgm_name,
+        filters[filter],
+        methods[method],
+        numthreads,
+        chunk_size)
+
+    #cold run
+    command =  'perf stat '
+    command += main_args
+    ret = execute_command(command)
+
+    #actual run: captures at most 4 counters per perf execution
+    # to avoid any side-effect from perf.
+    counters = [
+        'instructions:u',
+        'L1-dcache-loads:u',
+        'L1-dcache-load-misses:u',
+        'LLC-loads:u',
+        'LLC-load-misses:u',
+    ]
+    groups_of_four_counters = [counters[i:i+4] for i in
+                               range(0, len(counters), 4)]
+    partial_results = {}
+    for counter_group in groups_of_four_counters:
+        command =  'perf stat -r {} -e {} '.format(repeat,
+                                                   ",".join(counter_group))
+        command += main_args
+        ret = execute_command(command)
+        parsed = parse_perf(ret)
+        partial_results = {**parsed, **partial_results}
+        if partial_results['dump'] != parsed['dump']:
+            partial_results['dump'] += '\n' + parsed['dump']
+
+    #get time
+    main_args = './main.out -t {} -i {} -f {} -m {} -n {} -c {}'.format(
+        1, #print time
+        pgm_name,
+        filters[filter],
+        methods[method],
+        numthreads,
+        chunk_size)
+
+    time = 0
+    for i in range(repeat):
+        ret = execute_command(main_args)
+        time += float(ret[5:])
+    time = time / repeat
+    partial_results['time'] = time
+
+    results[key] = partial_results
+
+    #saves the result to the pickle file.
+    with open('data.pickle', 'wb') as f:
+        pickle.dump(results, f, pickle.HIGHEST_PROTOCOL)
+
 colours = {"sequential" : 'r',
        "sharded_rows": 'b',
        "sharded_columns column major" : 'g',
@@ -307,69 +375,3 @@ def graph4(mode, filter = "3x3"):
 
 graph4('time')
 
-# helper
-def run_perf_exp4(filter, method, numthreads = 1, chunk_size = 1, width = 1, repeat =
-10):
-    key = (filter, method, numthreads, chunk_size, width)
-    if results.get(key) != None:
-        return
-
-    pgm_name = 'widthSize' + width + '.txt'
-    pgm_creator_args = './pgm_creator.out {} {} {}'.format(width, width, pgm_name)
-
-    main_args = './main.out -t {} -i {} -f {} -m {} -n {} -c {}'.format(
-        0, #don't print time
-        pgm_name,
-        filters[filter],
-        methods[method],
-        numthreads,
-        chunk_size)
-
-    #cold run
-    command =  'perf stat '
-    command += main_args
-    ret = execute_command(command)
-
-    #actual run: captures at most 4 counters per perf execution
-    # to avoid any side-effect from perf.
-    counters = [
-        'instructions:u',
-        'L1-dcache-loads:u',
-        'L1-dcache-load-misses:u',
-        'LLC-loads:u',
-        'LLC-load-misses:u',
-    ]
-    groups_of_four_counters = [counters[i:i+4] for i in
-                               range(0, len(counters), 4)]
-    partial_results = {}
-    for counter_group in groups_of_four_counters:
-        command =  'perf stat -r {} -e {} '.format(repeat,
-                                                   ",".join(counter_group))
-        command += main_args
-        ret = execute_command(command)
-        parsed = parse_perf(ret)
-        partial_results = {**parsed, **partial_results}
-        if partial_results['dump'] != parsed['dump']:
-            partial_results['dump'] += '\n' + parsed['dump']
-
-    #get time
-    main_args = './main.out -t {} -i {} -f {} -m {} -n {} -c {}'.format(
-        1, #print time
-        pgm_name,
-        filters[filter],
-        methods[method],
-        numthreads,
-        chunk_size)
-
-    time = 0
-    for i in range(repeat):
-        ret = execute_command(main_args)
-        time += float(ret[5:])
-    time = time / repeat
-    partial_results['time'] = time
-
-    results[key] = partial_results
-
-    #saves the result to the pickle file.
-    with open('data.pickle', 'wb') as f:
-        pickle.dump(results, f, pickle.HIGHEST_PROTOCOL)
