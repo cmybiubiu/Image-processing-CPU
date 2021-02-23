@@ -2,7 +2,7 @@ CC=gcc
 GCC_OPT = -O2 -Wall -Werror
 PGM_NAME = pgmWidthSize
 PGM_TYPE = .txt
-WIDTHS = 1 8 16 64 512 1024 4096 32768
+WIDTHS = 1 2 4 8 16 32 64 128 256 512 1024 2048 4096 8192 16384 32768
 
 all: pgm_creator my_pgm main
 
