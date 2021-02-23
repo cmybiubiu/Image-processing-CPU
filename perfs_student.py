@@ -84,7 +84,7 @@ filters = {"3x3" : 1,
        "9x9" : 3,
        "1x1" : 4}
 
-width_sizes = [1, 8, 16, 64, 512, 1024, 4096]
+width_sizes = [1, 8, 16, 64, 512, 1024, 4096, 32768]
 
 #keys are tuples:
 #(filter, method, numthreads, [chunk_size])
