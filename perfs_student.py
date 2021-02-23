@@ -364,7 +364,7 @@ def graph4(mode, filter = "3x3"):
     #sets are unordered by default, so impose an order with this list.
     methods_as_list = list(methods.keys())
 
-    xvals = [0, 1, 10, 100, 1000, 10000, 100000]
+    xvals = [1,8,16,64,512,1024,4096,32768]
     list_of_colors = [colours[method] for method in methods_as_list]
     list_of_yvals = [local_results[method] for method in methods_as_list]
     filename = 'graph_{}.png'.format(mode+" 4")
