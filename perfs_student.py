@@ -84,7 +84,7 @@ filters = {"3x3" : 1,
        "9x9" : 3,
        "1x1" : 4}
 
-width_sizes = [1, 8, 16, 64, 512, 1024, 4096, 32768]
+width_sizes = [1, 8, 16, 64, 512, 1024, 4096]
 
 #keys are tuples:
 #(filter, method, numthreads, [chunk_size])
@@ -362,9 +362,10 @@ def graph4(mode, filter = "3x3"):
 
     #sets are unordered by default, so impose an order with this list.
     methods_as_list = list(methods.keys())
+    x_axis = [1, 10, 100, 1000, 10000]
 
     plotter.graph(
-        width_sizes, # x axis
+        x_axis, # x axis
         [local_results[method] for method in methods_as_list], # y vals
         methods_as_list,  # names for each line
         [colours[method] for method in methods_as_list],
