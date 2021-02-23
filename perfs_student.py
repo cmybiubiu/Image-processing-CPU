@@ -1,12 +1,12 @@
 #* ------------
-#* This code is provided solely for the personal and private use of 
+#* This code is provided solely for the personal and private use of
 #* students taking the CSC367 course at the University of Toronto.
-#* Copying for purposes other than this use is expressly prohibited. 
-#* All forms of distribution of this code, whether as given or with 
-#* any changes, are expressly prohibited. 
-#* 
+#* Copying for purposes other than this use is expressly prohibited.
+#* All forms of distribution of this code, whether as given or with
+#* any changes, are expressly prohibited.
+#*
 #* Authors: Bogdan Simion, Maryam Dehnavi, Felipe de Azevedo Piovezan
-#* 
+#*
 #* All of the files in this directory and all subdirectories are:
 #* Copyright (c) 2020 Bogdan Simion and Maryam Dehnavi
 #* -------------
@@ -32,7 +32,7 @@ import plotter
 #said command fails.
 def execute_command(command):
   print(">>>>> Executing command {}".format(command))
-  process = subprocess.Popen(command, stdout = subprocess.PIPE, 
+  process = subprocess.Popen(command, stdout = subprocess.PIPE,
       stderr = subprocess.STDOUT, shell=True,
       universal_newlines = True)
   return_code = process.wait()
@@ -50,7 +50,7 @@ def parse_perf(x):
   dict = {}
   dict['dump'] = x
   x = x.replace(',', '')
-  # perf has this weird behavior where if we pass some counters with 
+  # perf has this weird behavior where if we pass some counters with
   # "u", i.e., -e instructions:u,L1-dcache-loads:u
   # some of them will be reported without the u, which is
   # why it is removed here.
@@ -62,7 +62,7 @@ def parse_perf(x):
        'LLC-load-misses' : 'll_loadmisses',
        }
   #this     \/ whitespace is important to get the longest match.
-  fp_regex = ('.*\s((\d+\.\d*)|(\d+))\s*{}\s*(#.*L1-dcache hits)?\s*' + 
+  fp_regex = ('.*\s((\d+\.\d*)|(\d+))\s*{}\s*(#.*L1-dcache hits)?\s*' +
       re.escape('( +-') + '\s*(\d+\.\d+)' + re.escape('% )') + '.*')
   for name, key in items.items():
     vals = re.match(fp_regex.format(name), x, flags=re.DOTALL)
@@ -71,6 +71,7 @@ def parse_perf(x):
   return dict
 
 threads = [1,2,4,8]
+chunk_sizes = [1, 2, 4, 8, 16, 32]
 methods = {
        "sequential" : 1,
        "sharded_rows": 2,
@@ -124,7 +125,7 @@ def run_perf(filter, method, numthreads = 1, chunk_size = 1, input_file=default_
        'LLC-loads:u',
        'LLC-load-misses:u',
        ]
-  groups_of_four_counters = [counters[i:i+4] for i in 
+  groups_of_four_counters = [counters[i:i+4] for i in
       range(0, len(counters), 4)]
   partial_results = {}
   for counter_group in groups_of_four_counters:
@@ -185,8 +186,7 @@ def graph(mode, filter = "3x3"):
       run_perf(*key)
       local_results[method] += [float(results[key][mode])]
 
-  title = ('4M pixels square image, filter = {}, chunk_size (workqueue) = #'
-      'threads. Average over 10 runs.'.format(filter))
+  title = ('4M pixels square image, filter = {}, chunk_size (workqueue) = #threads. Average over 10 runs.'.format(filter))
   ylabel = mode
   if mode == 'time':
     ylabel += "(s)"
@@ -199,7 +199,7 @@ def graph(mode, filter = "3x3"):
     [local_results[method] for method in methods_as_list], # y vals
     methods_as_list,  # names for each line
     [colours[method] for method in methods_as_list],
-    'graph_{}.png'.format(mode+filter), # filename
+    'graph_{}.png'.format(mode+filter+" 1"), # filename
     title,
     "# Threads", # xlabel
     ylabel
@@ -207,3 +207,68 @@ def graph(mode, filter = "3x3"):
 
 graph('time')
 graph('l1d_loadmisses')
+
+def graph2(mode, filter = "3x3"):
+  local_results = defaultdict(list)
+  for nthread in threads:
+    for chunk_size in chunk_sizes:
+      method = "work queue"
+      key = (filter, method, nthread, chunk_size, default_file)
+      run_perf(*key)
+      local_results[nthread] += [float(results[key][mode])]
+
+  title = ("4M pixels square image, filter = {}, method = work queue."+
+  " Average over 10 runs.".format(filter))
+  ylabel = mode
+  if mode == 'time':
+    ylabel += "(s)"
+
+  #sets are unordered by default, so impose an order with this list.
+  methods_as_list = list(methods.keys())
+
+  plotter.graph(
+    chunk_sizes, # x axis
+    [local_results[nthread] for nthread in threads], # y vals
+    threads,  # names for each line
+    [colours[nthread] for nthread in threads],
+    'graph_{}.png'.format(mode+filter+" 2"), # filename
+    title,
+    "Chuck Size", # xlabel
+    ylabel
+  )
+
+graph2('time')
+graph2('l1d_loadmisses')
+
+def graph3(mode):
+  local_results = defaultdict(list)
+  for method in methods:
+    for filter in ["1x1", "3x3", "5x5", "9x9"]:
+      nthread = 8
+      chunk_size = nthread
+      key = (filter, method, nthread, chunk_size, default_file)
+      run_perf(*key)
+      local_results[method] += [float(results[key][mode])]
+
+  title = ('4M pixels square image, #thread = 8, chunk_size = 8. Average over 10 runs.')
+  ylabel = mode
+  if mode == 'time':
+    ylabel += "(s)"
+
+  #sets are unordered by default, so impose an order with this list.
+  methods_as_list = list(methods.keys())
+  filters_as_list = ["1x1", "3x3", "5x5", "9x9"]
+
+  plotter.graph(
+    filters_as_list, # x axis
+    [local_results[method] for method in methods_as_list], # y vals
+    methods_as_list,  # names for each line
+    [colours[method] for method in methods_as_list],
+    'graph_{}.png'.format(mode+" 3"), # filename
+    title,
+    "Filter Sizes", # xlabel
+    ylabel
+  )
+  
+graph3('time')
+graph3('l1d_loadmisses')
