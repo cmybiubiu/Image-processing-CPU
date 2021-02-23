@@ -184,7 +184,29 @@ def run_perf_exp4(filter, method, numthreads = 1, chunk_size = 1, width = 1, rep
     command += main_args
     ret = execute_command(command)
 
+    #partial_results = {}
+
+    #actual run: captures at most 4 counters per perf execution
+    # to avoid any side-effect from perf.
+    counters = [
+        'instructions:u',
+        'L1-dcache-loads:u',
+        'L1-dcache-load-misses:u',
+        'LLC-loads:u',
+        'LLC-load-misses:u',
+    ]
+    groups_of_four_counters = [counters[i:i+4] for i in
+                           range(0, len(counters), 4)]
     partial_results = {}
+    for counter_group in groups_of_four_counters:
+        command =  'perf stat -r {} -e {} '.format(repeat,
+                                               ",".join(counter_group))
+        command += main_args
+        ret = execute_command(command)
+        parsed = parse_perf(ret)
+        partial_results = {**parsed, **partial_results}
+        if partial_results['dump'] != parsed['dump']:
+            partial_results['dump'] += '\n' + parsed['dump']
 
     #get time
     main_args = './main.out -t {} -i {} -f {} -m {} -n {} -c {}'.format(
@@ -255,9 +277,6 @@ def graph(mode, filter = "3x3"):
     ylabel
   )
 
-graph('time')
-graph('l1d_loadmisses')
-
 
 # Experiment 2: Work Pool Method with Different Chunk Sizes
 def graph2(mode, filter = "3x3"):
@@ -288,9 +307,6 @@ def graph2(mode, filter = "3x3"):
     "Chuck Size", # xlabel
     ylabel
   )
-
-graph2('time')
-graph2('l1d_loadmisses')
 
 
 # Experiment 3: Impact of Different Filter Sizes
@@ -324,9 +340,6 @@ def graph3(mode):
     ylabel
   )
   
-graph3('time')
-graph3('l1d_loadmisses')
-
 
 # Experiment 4: Impact of Different Images
 def graph4(mode, filter = "3x3"):
@@ -374,5 +387,11 @@ def graph4(mode, filter = "3x3"):
     plt.savefig(filename, bbox_inches='tight')
 
 
+graph('time')
+graph('l1d_loadmisses')
+graph2('time')
+graph2('l1d_loadmisses')
+graph3('time')
+graph3('l1d_loadmisses')
 graph4('time')
-
+graph4('l1d_loadmisses')
