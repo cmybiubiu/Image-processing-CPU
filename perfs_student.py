@@ -299,7 +299,7 @@ def graph4(mode, filter = "3x3"):
         [local_results[method] for method in methods_as_list], # y vals
         methods_as_list,  # names for each line
         [colours[method] for method in methods_as_list],
-        'graph_{}.png'.format(mode+" 3"), # filename
+        'graph_{}.png'.format(mode+" 4"), # filename
         title,
         "Width Sizes", # xlabel
         ylabel
