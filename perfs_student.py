@@ -220,7 +220,7 @@ def run_perf_exp4(filter, method, numthreads = 1, chunk_size = 1, width = 1, rep
     time = 0
     for i in range(repeat):
         ret = execute_command(main_args)
-        print ret
+        print(ret)
         #time += float(ret[5:])
     time = time / repeat
     partial_results['time'] = time
