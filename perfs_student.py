@@ -164,17 +164,20 @@ def run_perf(filter, method, numthreads = 1, chunk_size = 1, input_file=default_
 
 
 # helper for experiment 4
+def create_pgm_with_width(width):
+    pgm_name = 'pgmWidthSize{}.txt'.format(width)
+    pgm_creator_args = './pgm_creator.out {} {} {}'.format(width, width, pgm_name)
+
+    command = pgm_creator_args
+    ret = execute_command(command)
+
 def run_perf_exp4(filter, method, numthreads = 1, chunk_size = 1, width = 1, repeat =
 10):
     key = (filter, method, numthreads, chunk_size, width)
     if results.get(key) != None:
         return
 
-    pgm_name = 'widthSize{}.txt'.format(width)
-    pgm_creator_args = './pgm_creator.out {} {} {}'.format(width, width, pgm_name)
-
-    command = pgm_creator_args
-    ret = execute_command(command)
+    pgm_name = 'pgmWidthSize{}.txt'.format(width)
 
     main_args = './main.out -t {} -i {} -f {} -m {} -n {} -c {}'.format(
         0, #don't print time
@@ -349,6 +352,9 @@ def graph3(mode):
 
 def graph4(mode, filter = "3x3"):
     local_results = defaultdict(list)
+    for width in width_sizes:
+        create_pgm_with_width(width)
+
     for method in methods:
         for width in width_sizes:
             nthread = 8
