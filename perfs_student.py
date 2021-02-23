@@ -170,7 +170,7 @@ def run_perf_exp4(filter, method, numthreads = 1, chunk_size = 1, width = 1, rep
     if results.get(key) != None:
         return
 
-    pgm_name = 'widthSize' + width + '.txt'
+    pgm_name = 'widthSize{}.txt'.format(width)
     pgm_creator_args = './pgm_creator.out {} {} {}'.format(width, width, pgm_name)
 
     main_args = './main.out -t {} -i {} -f {} -m {} -n {} -c {}'.format(
