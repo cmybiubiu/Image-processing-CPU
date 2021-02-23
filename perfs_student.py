@@ -356,25 +356,38 @@ def graph4(mode, filter = "3x3"):
             run_perf_exp4(*key)
             local_results[method] += [float(results[key][mode])]
 
-    title = ('4M pixels square image, #thread = 8, chunk_size = 8. Average over 10 runs.')
+    title = ('1M pixels square image, #thread = 8, chunk_size = 8. Average over 10 runs.')
     ylabel = mode
     if mode == 'time':
         ylabel += "(s)"
 
     #sets are unordered by default, so impose an order with this list.
     methods_as_list = list(methods.keys())
-    x_axis = [1, 10, 100, 1000, 10000, 100000]
 
-    plotter.graph(
-        width_powers, # x axis
-        [local_results[method] for method in methods_as_list], # y vals
-        methods_as_list,  # names for each line
-        [colours[method] for method in methods_as_list],
-        'graph_{}.png'.format(mode+" 4"), # filename
-        title,
-        "Width Sizes", # xlabel
-        ylabel
-    )
+    xvals = [0, 1, 10, 100, 1000, 10000, 100000]
+    list_of_colors = [colours[method] for method in methods_as_list]
+    list_of_yvals = [local_results[method] for method in methods_as_list]
+    filename = 'graph_{}.png'.format(mode+" 4")
+    xlabel = "Width Sizes"
+
+    legends = []
+    for i in range(len(methods_as_list)):
+        patch = mpatches.Patch(color=list_of_colors[i], label=methods_as_list[i])
+        legends += [patch]
+
+    plt.clf()
+    for i in range(len(list_of_yvals)):
+        plt.plot(xvals, list_of_yvals[i], list_of_colors[i])
+
+    plt.xticks(xvals, xvals)
+    plt.legend(handles=legends)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.subplots_adjust(top=0.85)
+    plt.title(wrap(title, 60), y = 1.08)
+    plt.xscale('log')
+    plt.savefig(filename, bbox_inches='tight')
+
 
 graph4('time')
 #graph4('l1d_loadmisses')
