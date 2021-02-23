@@ -84,7 +84,7 @@ filters = {"3x3" : 1,
        "9x9" : 3,
        "1x1" : 4}
 
-width_sizes = [1, 8, 16, 64, 512, 1024, 4096]
+width_powers = [0, 3, 4, 6, 9, 10, 12, 15]
 
 #keys are tuples:
 #(filter, method, numthreads, [chunk_size])
@@ -349,7 +349,8 @@ def graph4(mode, filter = "3x3"):
     local_results = defaultdict(list)
 
     for method in methods:
-        for width in width_sizes:
+        for power in width_powers:
+            width = 1 << power
             nthread = 8
             chunk_size = nthread
             key = (filter, method, nthread, chunk_size, width)
