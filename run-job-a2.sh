@@ -12,6 +12,8 @@ rm -f data.pickle # This ensures that you are not using the profiling data from 
 make pgm_creator
 ./pgm_creator.out
 
+make create_pgms
+
 #Compile your code
 make clean # The first time you run this script, you might get an error/warning which is normal, ignore it!
 make main

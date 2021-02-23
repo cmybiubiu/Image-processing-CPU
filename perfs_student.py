@@ -15,7 +15,6 @@
 #If you changed it somehow or added new printf statements (neither of which you
 #should do for the final submission), the script won't work.
 
-
 import subprocess
 import os
 import re
@@ -185,28 +184,7 @@ def run_perf_exp4(filter, method, numthreads = 1, chunk_size = 1, width = 1, rep
     command += main_args
     ret = execute_command(command)
 
-    #actual run: captures at most 4 counters per perf execution
-    # to avoid any side-effect from perf.
-    # counters = [
-    #     'instructions:u',
-    #     'L1-dcache-loads:u',
-    #     'L1-dcache-load-misses:u',
-    #     'LLC-loads:u',
-    #     'LLC-load-misses:u',
-    # ]
-    # groups_of_four_counters = [counters[i:i+4] for i in
-    #                            range(0, len(counters), 4)]
-
     partial_results = {}
-    # for counter_group in groups_of_four_counters:
-    #     command =  'perf stat -r {} -e {} '.format(repeat,
-    #                                                ",".join(counter_group))
-    #     command += main_args
-    #     ret = execute_command(command)
-    #     parsed = parse_perf(ret)
-    #     partial_results = {**parsed, **partial_results}
-    #     if partial_results['dump'] != parsed['dump']:
-    #         partial_results['dump'] += '\n' + parsed['dump']
 
     #get time
     main_args = './main.out -t {} -i {} -f {} -m {} -n {} -c {}'.format(
@@ -221,14 +199,12 @@ def run_perf_exp4(filter, method, numthreads = 1, chunk_size = 1, width = 1, rep
     for i in range(repeat):
         ret = execute_command(main_args)
         time += float(ret[5:])
-        print (ret)
+        #print (ret)
     time = time / repeat
     partial_results['time'] = time
-    print ("method: {}, time: {}".format(method, time))
 
     results[key] = partial_results
 
-    #saves the result to the pickle file.
     with open('data.pickle', 'wb') as f:
         pickle.dump(results, f, pickle.HIGHEST_PROTOCOL)
 
@@ -248,7 +224,9 @@ colours = {"sequential" : 'r',
        "9x9" : 'c',
       }
 
+
 #Plot "mode" on the y axis and  number of threads on the x axis.
+# Experiment 1: Comparing the Performance Among Different Methods
 def graph(mode, filter = "3x3"):
   local_results = defaultdict(list)
   for method in methods:
@@ -277,9 +255,11 @@ def graph(mode, filter = "3x3"):
     ylabel
   )
 
-# graph('time')
-# graph('l1d_loadmisses')
+graph('time')
+graph('l1d_loadmisses')
 
+
+# Experiment 2: Work Pool Method with Different Chunk Sizes
 def graph2(mode, filter = "3x3"):
   local_results = defaultdict(list)
   for nthread in threads:
@@ -309,9 +289,11 @@ def graph2(mode, filter = "3x3"):
     ylabel
   )
 
-# graph2('time')
-# graph2('l1d_loadmisses')
+graph2('time')
+graph2('l1d_loadmisses')
 
+
+# Experiment 3: Impact of Different Filter Sizes
 def graph3(mode):
   local_results = defaultdict(list)
   for method in methods:
@@ -342,10 +324,11 @@ def graph3(mode):
     ylabel
   )
   
-#graph3('time')
-# graph3('l1d_loadmisses')
+graph3('time')
+graph3('l1d_loadmisses')
 
 
+# Experiment 4: Impact of Different Images
 def graph4(mode, filter = "3x3"):
     local_results = defaultdict(list)
 
@@ -392,5 +375,4 @@ def graph4(mode, filter = "3x3"):
 
 
 graph4('time')
-#graph4('l1d_loadmisses')
 
