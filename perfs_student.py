@@ -223,6 +223,7 @@ def run_perf_exp4(filter, method, numthreads = 1, chunk_size = 1, width = 1, rep
         time += float(ret[5:])
     time = time / repeat
     partial_results['time'] = time
+    print ("method: {}, time: {}".format(method, time))
 
     results[key] = partial_results
 
