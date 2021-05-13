@@ -5,7 +5,7 @@ PGM_TYPE = .txt
 
 TOTAL_SIZE = 1048576
 
-all: pgm_creator create_sample create_pgms main
+all: pgm_creator create_sample very_big_sample.o very_tall_sample.o create_pgms main
 
 %.o: %.c
 	$(CC) -c -o $@ $< $(GCC_OPT)
@@ -15,7 +15,7 @@ main: very_big_sample.o very_tall_sample.o main.c pgm.c filters.c
 
 pgm_creator:
 	$(CC) $(GCC_OPT) pgm_creator.c pgm.c -o pgm_creator.out
-
+	
 create_sample:
 	./pgm_creator.out
 
